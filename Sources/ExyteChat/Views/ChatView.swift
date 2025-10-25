@@ -131,6 +131,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var headerSpacingHeight: CGFloat = 0
     var footerSpacingHeight: CGFloat = 0
     var scrollEndCallback: ((UIScrollView) -> Void)?
+    var preserveOriginalOrder: Bool = false  // 新增：保持原始消息顺序
     
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -163,7 +164,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.reactionDelegate = reactionDelegate
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode, preserveOriginalOrder: preserveOriginalOrder)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
@@ -636,6 +637,24 @@ public extension ChatView {
     func onScrollEnd(_ callback: @escaping (UIScrollView) -> Void) -> ChatView {
         var view = self
         view.scrollEndCallback = callback
+        return view
+    }
+    
+    /// Preserves the original order of messages without sorting by createdAt
+    /// - Parameter preserve: Whether to preserve original message order (default: true)
+    /// - Note: When enabled, all messages are placed in a single section, maintaining the exact order they were provided
+    func preserveOriginalOrder(_ preserve: Bool = true) -> ChatView {
+        var view = self
+        view.preserveOriginalOrder = preserve
+        return view
+    }
+    
+    /// Completely disables date-based grouping and sorting, placing all messages in a single section
+    /// - Parameter disable: Whether to disable date grouping (default: true)
+    /// - Note: This ensures your opening message and other messages stay in their original order regardless of createdAt timestamps
+    func disableDateGrouping(_ disable: Bool = true) -> ChatView {
+        var view = self
+        view.preserveOriginalOrder = disable  // 复用同一个标志，语义更明确
         return view
     }
     

@@ -9,33 +9,72 @@ import SwiftUI
 
 extension ChatView {
 
-    nonisolated static func mapMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    nonisolated static func mapMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, preserveOriginalOrder: Bool = false, disableDateGrouping: Bool = false) -> [MessagesSection] {
         guard messages.hasUniqueIDs() else {
             fatalError("Messages can not have duplicate ids, please make sure every message gets a unique id")
         }
 
         let result: [MessagesSection]
-        switch replyMode {
-        case .quote:
-            result = mapMessagesQuoteModeReplies(messages, chatType: chatType, replyMode: replyMode)
-        case .answer:
-            result = mapMessagesCommentModeReplies(messages, chatType: chatType, replyMode: replyMode)
+        
+        // 如果要求保持原始顺序，使用无分组的简化版本
+        if preserveOriginalOrder {
+            result = mapMessagesWithoutGrouping(messages, chatType: chatType, replyMode: replyMode)
+        } else {
+            switch replyMode {
+            case .quote:
+                result = mapMessagesQuoteModeReplies(messages, chatType: chatType, replyMode: replyMode, preserveOriginalOrder: preserveOriginalOrder)
+            case .answer:
+                result = mapMessagesCommentModeReplies(messages, chatType: chatType, replyMode: replyMode, preserveOriginalOrder: preserveOriginalOrder)
+            }
         }
 
         return result
     }
 
-    nonisolated static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    /// 无分组版本：所有消息放在一个section中，完全保持原始顺序
+    nonisolated static func mapMessagesWithoutGrouping(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+        // 对于quote模式：直接按原始顺序处理所有消息
+        if replyMode == .quote {
+            let wrappedMessages = wrapSectionMessages(messages, chatType: chatType, replyMode: replyMode, isFirstSection: true, isLastSection: true)
+            return [MessagesSection(date: Date(), rows: wrappedMessages)]
+        }
+        
+        // 对于answer模式：需要处理回复层级，但仍保持整体顺序
+        let firstLevelMessages = messages.filter { $0.replyMessage == nil }
+        var allMessages: [Message] = []
+        
+        // 按照原始顺序处理一级消息和它们的回复
+        for firstLevelMessage in firstLevelMessages {
+            if chatType == .conversation {
+                allMessages.append(firstLevelMessage)
+            }
+            
+            // 添加这个一级消息的所有回复（保持原始顺序）
+            let replies = getRepliesFor(id: firstLevelMessage.id, messages: messages)
+            allMessages.append(contentsOf: replies)
+            
+            if chatType == .comments {
+                allMessages.append(firstLevelMessage)
+            }
+        }
+        
+        let wrappedMessages = wrapSectionMessages(allMessages, chatType: chatType, replyMode: replyMode, isFirstSection: true, isLastSection: true)
+        return [MessagesSection(date: Date(), rows: wrappedMessages)]
+    }
+
+    nonisolated static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, preserveOriginalOrder: Bool) -> [MessagesSection] {
         let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
-            .sorted()
-            .reversed()
+        let sortedDates = preserveOriginalOrder ? dates.sorted() : dates.sorted().reversed()
         var result: [MessagesSection] = []
 
-        for date in dates {
+        for date in sortedDates {
+            let dayMessages = messages.filter({ $0.createdAt.isSameDay(date) })
+            let wrappedMessages = wrapSectionMessages(dayMessages, chatType: chatType, replyMode: replyMode, isFirstSection: false, isLastSection: false)
+            
             let section = MessagesSection(
                 date: date,
                 // use fake isFirstSection/isLastSection because they are not needed for quote replies
-                rows: wrapSectionMessages(messages.filter({ $0.createdAt.isSameDay(date) }), chatType: chatType, replyMode: replyMode, isFirstSection: false, isLastSection: false)
+                rows: preserveOriginalOrder ? wrappedMessages : wrappedMessages.reversed()
             )
             result.append(section)
         }
@@ -43,22 +82,23 @@ extension ChatView {
         return result
     }
 
-    nonisolated static func mapMessagesCommentModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    nonisolated static func mapMessagesCommentModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, preserveOriginalOrder: Bool) -> [MessagesSection] {
         let firstLevelMessages = messages.filter { m in
             m.replyMessage == nil
         }
 
         let dates = Set(firstLevelMessages.map({ $0.createdAt.startOfDay() }))
-            .sorted()
-            .reversed()
+        let sortedDates = preserveOriginalOrder ? dates.sorted() : dates.sorted().reversed()
         var result: [MessagesSection] = []
 
-        for date in dates {
+        for date in sortedDates {
             let dayFirstLevelMessages = firstLevelMessages.filter({ $0.createdAt.isSameDay(date) })
             var dayMessages = [Message]() // insert second level in between first level
             for m in dayFirstLevelMessages {
                 var replies = getRepliesFor(id: m.id, messages: messages)
-                replies.sort { $0.createdAt < $1.createdAt }
+                if !preserveOriginalOrder {
+                    replies.sort { $0.createdAt < $1.createdAt }
+                }
                 if chatType == .conversation {
                     dayMessages.append(m)
                 }
@@ -68,10 +108,11 @@ extension ChatView {
                 }
             }
 
-            let isFirstSection = dates.first == date
-            let isLastSection = dates.last == date
+            let isFirstSection = sortedDates.first == date
+            let isLastSection = sortedDates.last == date
             let sectionRows = wrapSectionMessages(dayMessages, chatType: chatType, replyMode: replyMode, isFirstSection: isFirstSection, isLastSection: isLastSection)
-            result.append(MessagesSection(date: date, rows: sectionRows))
+            let finalRows = preserveOriginalOrder ? sectionRows : sectionRows.reversed()
+            result.append(MessagesSection(date: date, rows: finalRows))
         }
 
         return result
