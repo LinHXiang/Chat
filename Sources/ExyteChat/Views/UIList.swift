@@ -598,7 +598,31 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 .minSize(width: 0, height: 0)
                 .margins(.all, 0)
             } else {
-                // Fallback on earlier versions
+                let hostingController = UIHostingController(rootView:
+                    ChatMessageView(
+                        viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
+                        avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure,
+                        messageStyler: messageStyler, shouldShowLinkPreview: shouldShowLinkPreview,
+                        isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView,
+                        messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
+                    )
+                    .transition(.scale)
+                    .background(MessageMenuPreferenceViewSetter(id: row.id))
+                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
+                )
+
+                tableViewCell.contentView.subviews.forEach { $0.removeFromSuperview() }
+                if let hostingView = hostingController.view {
+                    hostingView.translatesAutoresizingMaskIntoConstraints = false
+                    hostingView.backgroundColor = .clear
+                    tableViewCell.contentView.addSubview(hostingView)
+                    NSLayoutConstraint.activate([
+                        hostingView.leadingAnchor.constraint(equalTo: tableViewCell.contentView.leadingAnchor),
+                        hostingView.trailingAnchor.constraint(equalTo: tableViewCell.contentView.trailingAnchor),
+                        hostingView.topAnchor.constraint(equalTo: tableViewCell.contentView.topAnchor),
+                        hostingView.bottomAnchor.constraint(equalTo: tableViewCell.contentView.bottomAnchor)
+                    ])
+                }
             }
 
             return tableViewCell
