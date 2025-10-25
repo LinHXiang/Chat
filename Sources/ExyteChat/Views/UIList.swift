@@ -46,6 +46,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let ids: [String]
     let listSwipeActions: ListSwipeActions
     let keyboardDismissMode: UIScrollView.KeyboardDismissMode
+    let scrollEndCallback: ((UIScrollView) -> Void)?
 
     @State var isScrolledToTop = false
     @State var updateQueue = UpdateQueue()
@@ -385,7 +386,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont,
             sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG,
             listSwipeActions: listSwipeActions,
-            keyboardDismissMode: keyboardDismissMode)
+            keyboardDismissMode: keyboardDismissMode,
+            scrollEndCallback: scrollEndCallback)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -423,6 +425,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
         let keyboardDismissMode: UIScrollView.KeyboardDismissMode
+        let scrollEndCallback: ((UIScrollView) -> Void)?
 
         private let impactGenerator = UIImpactFeedbackGenerator(style: .heavy)
 
@@ -437,7 +440,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             shouldShowLinkPreview: @escaping (URL) -> Bool, showMessageTimeView: Bool,
             messageLinkPreviewLimit: Int, messageFont: UIFont, sections: [MessagesSection],
             ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
-            listSwipeActions: ListSwipeActions, keyboardDismissMode: UIScrollView.KeyboardDismissMode
+            listSwipeActions: ListSwipeActions, keyboardDismissMode: UIScrollView.KeyboardDismissMode,
+            scrollEndCallback: ((UIScrollView) -> Void)?
         ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
@@ -464,6 +468,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.paginationTargetIndexPath = paginationTargetIndexPath
             self.listSwipeActions = listSwipeActions
             self.keyboardDismissMode = keyboardDismissMode
+            self.scrollEndCallback = scrollEndCallback
         }
 
         /// call pagination handler when this row is reached
@@ -655,6 +660,17 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             isScrolledToBottom = scrollView.contentOffset.y <= spacingHeight
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
+        }
+        
+        // 滑动结束回调
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+            scrollEndCallback?(scrollView)
+        }
+        
+        func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            if !decelerate {
+                scrollEndCallback?(scrollView)
+            }
         }
     }
 

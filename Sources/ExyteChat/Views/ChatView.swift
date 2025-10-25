@@ -129,6 +129,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var spacingHeight: CGFloat = 0  // 新增：间隙高度
+    var scrollEndCallback: ((UIScrollView) -> Void)?  // 新增：滑动结束回调
     
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -346,7 +347,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             sections: sections,
             ids: ids,
             listSwipeActions: listSwipeActions,
-            keyboardDismissMode: keyboardDismissMode
+            keyboardDismissMode: keyboardDismissMode,
+            scrollEndCallback: scrollEndCallback
         )
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -614,6 +616,14 @@ public extension ChatView {
     func spacingHeight(_ height: CGFloat) -> ChatView {
         var view = self
         view.spacingHeight = height
+        return view
+    }
+    
+    /// Sets a callback for when scrolling ends
+    /// - Parameter callback: Called when scrolling animation completes or user stops dragging
+    func onScrollEnd(_ callback: @escaping (UIScrollView) -> Void) -> ChatView {
+        var view = self
+        view.scrollEndCallback = callback
         return view
     }
     
