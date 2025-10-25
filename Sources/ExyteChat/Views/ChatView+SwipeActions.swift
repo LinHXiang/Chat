@@ -75,8 +75,14 @@ public struct SwipeAction<V: View>: SwipeActionable {
             renderer.scale = UIScreen.main.scale
             return renderer.uiImage!
         } else {
-            // Fallback on earlier versions
-            return UIImage()
+            // Fallback on earlier versions - 使用传统方法渲染图像
+            let hostingController = UIHostingController(rootView: content().rotationEffect(type == .conversation ? .degrees(180) : .degrees(0)))
+            hostingController.view.frame = CGRect(x: 0, y: 0, width: 30, height: 30) // 设置合适的尺寸
+
+            let renderer = UIGraphicsImageRenderer(size: hostingController.view.bounds.size)
+            return renderer.image { _ in
+                hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+            }
         }
     }
 }

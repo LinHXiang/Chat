@@ -31,7 +31,16 @@ struct TextInputView: View {
             )
         } else {
             // Fallback on earlier versions
-            EmptyView()
+            TextField(style == .message ? localization.inputPlaceholder : localization.signatureText, text: $text)
+                .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
+                .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
+                .padding(.vertical, 10)
+                .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        globalFocusState.focus = .uuid(inputFieldId)
+                    }
+                )
         }
     }
     
