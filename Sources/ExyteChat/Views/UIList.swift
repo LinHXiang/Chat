@@ -72,7 +72,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         // comments模式：不旋转，headerView在顶部显示
         if spacingHeight > 0 {
             let spacingView = UIView()
-            spacingView.backgroundColor = .red
+            spacingView.backgroundColor = .clear
             spacingView.frame = .init(x: 0, y: 0, width: 0, height: spacingHeight)
             tableView.tableHeaderView = spacingView
         }
