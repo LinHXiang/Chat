@@ -30,6 +30,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     var inputView: InputView
 
     let type: ChatType
+    let spacingHeight: CGFloat  // 新增：间隙高度参数
     let showDateHeaders: Bool
     let isScrollEnabled: Bool
     let avatarSize: CGFloat
@@ -66,6 +67,16 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.isScrollEnabled = isScrollEnabled
         tableView.keyboardDismissMode = keyboardDismissMode
 
+        // 添加自定义间隙 - 由于tableView会根据chatType旋转，统一使用tableHeaderView即可
+        // conversation模式：旋转180度后，headerView实际在底部显示
+        // comments模式：不旋转，headerView在顶部显示
+        if spacingHeight > 0 {
+            let spacingView = UIView()
+            spacingView.backgroundColor = .red
+            spacingView.frame = .init(x: 0, y: 0, width: 0, height: spacingHeight)
+            tableView.tableHeaderView = spacingView
+        }
+        
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
@@ -366,7 +377,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             viewModel: viewModel, inputViewModel: inputViewModel,
             isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop,
             messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder,
-            headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders,
+            headerBuilder: headerBuilder, type: type, spacingHeight: spacingHeight, showDateHeaders: showDateHeaders,
             avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress,
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, shouldShowLinkPreview: shouldShowLinkPreview,
@@ -390,6 +401,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let headerBuilder: ((Date)->AnyView)?
 
         let type: ChatType
+        let spacingHeight: CGFloat  // 新增：间隙高度参数
         let showDateHeaders: Bool
         let avatarSize: CGFloat
         let showMessageMenuOnLongPress: Bool
@@ -418,7 +430,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
             isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>,
             messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (() -> AnyView)?,
-            headerBuilder: ((Date) -> AnyView)?, type: ChatType, showDateHeaders: Bool,
+            headerBuilder: ((Date) -> AnyView)?, type: ChatType, spacingHeight: CGFloat, showDateHeaders: Bool,
             avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
             tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,
             messageStyler: @escaping (String) -> AttributedString,
@@ -435,6 +447,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.mainHeaderBuilder = mainHeaderBuilder
             self.headerBuilder = headerBuilder
             self.type = type
+            self.spacingHeight = spacingHeight
             self.showDateHeaders = showDateHeaders
             self.avatarSize = avatarSize
             self.showMessageMenuOnLongPress = showMessageMenuOnLongPress

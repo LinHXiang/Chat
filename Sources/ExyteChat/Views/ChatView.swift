@@ -128,6 +128,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 //    var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+    var spacingHeight: CGFloat = 0  // 新增：间隙高度
     
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -330,6 +331,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             headerBuilder: headerBuilder,
             inputView: inputView,
             type: type,
+            spacingHeight: spacingHeight,
             showDateHeaders: showDateHeaders,
             isScrollEnabled: isScrollEnabled,
             avatarSize: avatarSize,
@@ -602,6 +604,16 @@ public extension ChatView {
     func keyboardDismissMode(_ mode: UIScrollView.KeyboardDismissMode) -> ChatView {
         var view = self
         view.keyboardDismissMode = mode
+        return view
+    }
+    
+    /// Sets custom spacing for the chat list
+    /// - Parameters:
+    ///   - height: The height of the spacing view (default: 0)
+    /// - Note: For conversation mode, spacing appears at bottom; for comments mode, appears at top
+    func spacingHeight(_ height: CGFloat) -> ChatView {
+        var view = self
+        view.spacingHeight = height
         return view
     }
     
