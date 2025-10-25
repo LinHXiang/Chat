@@ -128,8 +128,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 //    var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
-    var spacingHeight: CGFloat = 0  // 新增：间隙高度
-    var scrollEndCallback: ((UIScrollView) -> Void)?  // 新增：滑动结束回调
+    var headerSpacingHeight: CGFloat = 0
+    var footerSpacingHeight: CGFloat = 0
+    var scrollEndCallback: ((UIScrollView) -> Void)?
     
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -332,7 +333,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             headerBuilder: headerBuilder,
             inputView: inputView,
             type: type,
-            spacingHeight: spacingHeight,
+            headerSpacingHeight: headerSpacingHeight,
+            footerSpacingHeight: footerSpacingHeight,
             showDateHeaders: showDateHeaders,
             isScrollEnabled: isScrollEnabled,
             avatarSize: avatarSize,
@@ -613,9 +615,19 @@ public extension ChatView {
     /// - Parameters:
     ///   - height: The height of the spacing view (default: 0)
     /// - Note: For conversation mode, spacing appears at bottom; for comments mode, appears at top
-    func spacingHeight(_ height: CGFloat) -> ChatView {
+    func footerSpacingHeight(_ height: CGFloat) -> ChatView {
         var view = self
-        view.spacingHeight = height
+        view.footerSpacingHeight = height
+        return view
+    }
+    
+    /// Sets custom spacing for the chat list
+    /// - Parameters:
+    ///   - height: The height of the spacing view (default: 0)
+    /// - Note: For conversation mode, spacing appears at bottom; for comments mode, appears at top
+    func headerSpacingHeight(_ height: CGFloat) -> ChatView {
+        var view = self
+        view.headerSpacingHeight = height
         return view
     }
     

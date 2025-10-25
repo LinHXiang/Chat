@@ -30,7 +30,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     var inputView: InputView
 
     let type: ChatType
-    let spacingHeight: CGFloat  // 新增：间隙高度参数
+    let headerSpacingHeight: CGFloat
+    let footerSpacingHeight: CGFloat
     let showDateHeaders: Bool
     let isScrollEnabled: Bool
     let avatarSize: CGFloat
@@ -71,11 +72,18 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         // 添加自定义间隙 - 由于tableView会根据chatType旋转，统一使用tableHeaderView即可
         // conversation模式：旋转180度后，headerView实际在底部显示
         // comments模式：不旋转，headerView在顶部显示
-        if spacingHeight > 0 {
+        if footerSpacingHeight > 0 {
             let spacingView = UIView()
             spacingView.backgroundColor = .clear
-            spacingView.frame = .init(x: 0, y: 0, width: 0, height: spacingHeight)
+            spacingView.frame = .init(x: 0, y: 0, width: 0, height: footerSpacingHeight)
             tableView.tableHeaderView = spacingView
+        }
+        
+        if headerSpacingHeight > 0 {
+            let spacingView = UIView()
+            spacingView.backgroundColor = .clear
+            spacingView.frame = .init(x: 0, y: 0, width: 0, height: headerSpacingHeight)
+            tableView.tableFooterView = spacingView
         }
         
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
@@ -378,7 +386,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             viewModel: viewModel, inputViewModel: inputViewModel,
             isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop,
             messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder,
-            headerBuilder: headerBuilder, type: type, spacingHeight: spacingHeight, showDateHeaders: showDateHeaders,
+            headerBuilder: headerBuilder, type: type,
+            headerSpacingHeight: headerSpacingHeight, footerSpacingHeight: footerSpacingHeight, showDateHeaders: showDateHeaders,
             avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress,
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, shouldShowLinkPreview: shouldShowLinkPreview,
@@ -403,7 +412,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let headerBuilder: ((Date)->AnyView)?
 
         let type: ChatType
-        let spacingHeight: CGFloat  // 新增：间隙高度参数
+        let headerSpacingHeight: CGFloat
+        let footerSpacingHeight: CGFloat
         let showDateHeaders: Bool
         let avatarSize: CGFloat
         let showMessageMenuOnLongPress: Bool
@@ -433,7 +443,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
             isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>,
             messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (() -> AnyView)?,
-            headerBuilder: ((Date) -> AnyView)?, type: ChatType, spacingHeight: CGFloat, showDateHeaders: Bool,
+            headerBuilder: ((Date) -> AnyView)?, type: ChatType, headerSpacingHeight: CGFloat, footerSpacingHeight: CGFloat, showDateHeaders: Bool,
             avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
             tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,
             messageStyler: @escaping (String) -> AttributedString,
@@ -451,7 +461,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.mainHeaderBuilder = mainHeaderBuilder
             self.headerBuilder = headerBuilder
             self.type = type
-            self.spacingHeight = spacingHeight
+            self.headerSpacingHeight = headerSpacingHeight
+            self.footerSpacingHeight = footerSpacingHeight
             self.showDateHeaders = showDateHeaders
             self.avatarSize = avatarSize
             self.showMessageMenuOnLongPress = showMessageMenuOnLongPress
@@ -658,7 +669,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            isScrolledToBottom = scrollView.contentOffset.y <= spacingHeight
+            isScrolledToBottom = scrollView.contentOffset.y <= footerSpacingHeight
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
         }
         
