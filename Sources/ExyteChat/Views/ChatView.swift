@@ -7,9 +7,9 @@
 
 import SwiftUI
 import GiphyUISDK
-import ExyteMediaPicker
+//import ExyteMediaPicker
 
-public typealias MediaPickerParameters = SelectionParamsHolder
+//public typealias MediaPickerParameters = SelectionParamsHolder
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -117,15 +117,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
-    var mediaPickerSelectionParameters: MediaPickerParameters?
-    var orientationHandler: MediaPickerOrientationHandler = {_ in}
+//    var mediaPickerSelectionParameters: MediaPickerParameters?
+//    var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
     var paginationHandler: PaginationHandler?
     var showMessageTimeView = true
     var messageLinkPreviewLimit = 8
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
-    var recorderSettings: RecorderSettings = RecorderSettings()
+//    var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     
@@ -203,48 +203,48 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     }
                 }
             }
-            .onChange(of: selectedMedia) {
-                if let giphyMedia = selectedMedia {
-                    inputViewModel.attachments.giphyMedia = giphyMedia
-                    inputViewModel.send()
-                }
-            }
-            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
-                if giphyConfig.giphyKey != nil {
-                    GiphyEditorView(
-                        giphyConfig: giphyConfig,
-                        selectedMedia: $selectedMedia
-                    )
-                    .environmentObject(globalFocusState)
-                } else {
-                    Text("no giphy key found")
-                }
-            }
-            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(
-                    inputViewModel: inputViewModel,
-                    inputViewBuilder: inputViewBuilder,
-                    chatTitle: chatTitle,
-                    messageStyler: messageStyler,
-                    orientationHandler: orientationHandler,
-                    mediaPickerSelectionParameters: mediaPickerSelectionParameters,
-                    availableInputs: availableInputs,
-                    localization: localization
-                )
-                .environmentObject(globalFocusState)
-                .environmentObject(keyboardState)
-            }
+//            .onChange(of: selectedMedia) { newValue in
+//                if let giphyMedia = newValue {
+//                    inputViewModel.attachments.giphyMedia = giphyMedia
+//                    inputViewModel.send()
+//                }
+//            }
+//            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
+//                if giphyConfig.giphyKey != nil {
+//                    GiphyEditorView(
+//                        giphyConfig: giphyConfig,
+//                        selectedMedia: $selectedMedia
+//                    )
+//                    .environmentObject(globalFocusState)
+//                } else {
+//                    Text("no giphy key found")
+//                }
+//            }
+//            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+//                AttachmentsEditor(
+//                    inputViewModel: inputViewModel,
+//                    inputViewBuilder: inputViewBuilder,
+//                    chatTitle: chatTitle,
+//                    messageStyler: messageStyler,
+//                    orientationHandler: orientationHandler,
+//                    mediaPickerSelectionParameters: mediaPickerSelectionParameters,
+//                    availableInputs: availableInputs,
+//                    localization: localization
+//                )
+//                .environmentObject(globalFocusState)
+//                .environmentObject(keyboardState)
+//            }
         
-            .onChange(of: inputViewModel.showPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
-            .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
+//            .onChange(of: inputViewModel.showPicker) { newValue in
+//                if newValue {
+//                    globalFocusState.focus = nil
+//                }
+//            }
+//            .onChange(of: inputViewModel.showGiphyPicker) { newValue in
+//                if newValue {
+//                    globalFocusState.focus = nil
+//                }
+//            }
     }
     
     var mainView: some View {
@@ -400,7 +400,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     style: .message,
                     availableInputs: availableInputs,
                     messageStyler: messageStyler,
-                    recorderSettings: recorderSettings,
+//                    recorderSettings: recorderSettings,
                     localization: localization
                 )
             }
@@ -611,24 +611,24 @@ public extension ChatView {
         return view
     }
     
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = MediaPickerParameters()
-        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
-        return view
-    }
-    
-    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = params
-        return view
-    }
+//    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+//        var view = self
+//        view.mediaPickerSelectionParameters = MediaPickerParameters()
+//        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
+//        return view
+//    }
+//    
+//    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
+//        var view = self
+//        view.mediaPickerSelectionParameters = params
+//        return view
+//    }
 
-    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
-        var view = self
-        view.orientationHandler = orientationHandler
-        return view
-    }
+//    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
+//        var view = self
+//        view.orientationHandler = orientationHandler
+//        return view
+//    }
     
     /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
     /// NOTE: doesn't work well with `isScrollEnabled` false
@@ -705,11 +705,11 @@ public extension ChatView {
         return view
     }
     
-    func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
-        var view = self
-        view.recorderSettings = settings
-        return view
-    }
+//    func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
+//        var view = self
+//        view.recorderSettings = settings
+//        return view
+//    }
     
     /// Sets the general duration of various message menu animations
     ///

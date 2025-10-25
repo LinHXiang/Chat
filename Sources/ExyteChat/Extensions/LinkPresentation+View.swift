@@ -29,6 +29,7 @@ private struct LinkViewRepresentable: UIViewRepresentable {
 
     func updateUIView(_ uiView: LPLinkView, context: Context) {}
 
+    @available(iOS 16.0, *)
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: LPLinkView, context: Context) -> CGSize?
     {
         let width = proposal.width ?? uiView.intrinsicContentSize.width

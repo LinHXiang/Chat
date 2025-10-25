@@ -205,7 +205,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                 transitionViewState(to: .ready)
             }
         }
-        .onChange(of: keyboardState.keyboardFrame) {
+        .onChange(of: keyboardState.keyboardFrame) { _ in
             if viewState == .ready, keyboardState.isShown {
                 transitionViewState(to: .keyboard)
             }
@@ -637,12 +637,20 @@ struct MenuContainerModifier: ViewModifier {
         case .vStack:
             content
         case .scrollView(let height):
-            ScrollView {
-                content
+            if #available(iOS 16.0, *) {
+                ScrollView {
+                    content
+                }
+                .scrollIndicators(.hidden)
+                .frame(height: height)
+                .background(background)
+            } else {
+                ScrollView {
+                    content
+                }
+                .frame(height: height)
+                .background(background)
             }
-            .scrollIndicators(.hidden)
-            .frame(height: height)
-            .background(background)
         }
     }
 }

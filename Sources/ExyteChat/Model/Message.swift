@@ -86,21 +86,21 @@ public struct Message: Identifiable, Hashable, Sendable {
         user: User,
         status: Status? = nil,
         draft: DraftMessage) async -> Message {
-            let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
-                guard let thumbnailURL = await media.getThumbnailURL() else {
-                    return nil
-                }
-                
-                switch media.type {
-                case .image:
-                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                case .video:
-                    guard let fullURL = await media.getURL() else {
-                        return nil
-                    }
-                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
-                }
-            }
+//            let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
+//                guard let thumbnailURL = await media.getThumbnailURL() else {
+//                    return nil
+//                }
+//                
+//                switch media.type {
+//                case .image:
+//                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
+//                case .video:
+//                    guard let fullURL = await media.getURL() else {
+//                        return nil
+//                    }
+//                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
+//                }
+//            }
             
             let giphyMediaId = draft.giphyMedia?.id
             
@@ -110,7 +110,7 @@ public struct Message: Identifiable, Hashable, Sendable {
                 status: status,
                 createdAt: draft.createdAt,
                 text: draft.text,
-                attachments: attachments,
+                attachments: [],//attachments,
                 giphyMediaId: giphyMediaId,
                 recording: draft.recording,
                 replyMessage: draft.replyMessage

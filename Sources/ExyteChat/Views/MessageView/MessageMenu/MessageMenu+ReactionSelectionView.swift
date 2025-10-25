@@ -68,11 +68,11 @@ struct ReactionSelectionView: View {
                     if allowEmojiSearch, viewState.needsSearchButton {
                         // Finish the list with a `button` to open the keyboard in it's emoji state
                         additionalEmojiPickerView()
-                            .onChange(of: selectedEmoji) {
-                                transitionToViewState(.picked(selectedEmoji))
+                            .onChange(of: selectedEmoji) { newValue in
+                                transitionToViewState(.picked(newValue))
                             }
-                            .onChange(of: emojiEntryIsFocused) {
-                                if emojiEntryIsFocused {
+                            .onChange(of: emojiEntryIsFocused) { newValue in
+                                if newValue {
                                     transitionToViewState(.search)
                                 }
                             }
@@ -107,8 +107,8 @@ struct ReactionSelectionView: View {
         }
         .offset(x: xOffset, y: yOffset)
         .onAppear { transitionToViewState(.row) }
-        .onChange(of: keyboardState.isShown) {
-            if !keyboardState.isShown && viewState == .search {
+        .onChange(of: keyboardState.isShown) { newValue in
+            if !newValue && viewState == .search {
                 // Someone closed the keyboard while we were searching, return to `.row`
                 transitionToViewState(.row)
             }
@@ -242,13 +242,13 @@ struct ReactionSelectionView: View {
             switch previousState {
             case .row:
                 Task {
-                    try await Task.sleep(for: .milliseconds(animationDuration * 1333))
+//                    try await Task.sleep(for: .milliseconds(animationDuration * 1333))
                     reactionClosure(.emoji(emoji))
                 }
             case .search:
                 emojiEntryIsFocused = false
                 Task {
-                    try await Task.sleep(for: .milliseconds(animationDuration * 666))
+//                    try await Task.sleep(for: .milliseconds(animationDuration * 666))
                     reactionClosure(.emoji(selectedEmoji))
                 }
             case .initial, .picked:

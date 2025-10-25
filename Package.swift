@@ -6,7 +6,7 @@ let package = Package(
     name: "Chat",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -14,10 +14,6 @@ let package = Package(
             targets: ["ExyteChat"]),
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/exyte/MediaPicker.git",
-            from: "3.0.0"
-        ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",
             from: "1.0.0"
@@ -35,7 +31,6 @@ let package = Package(
         .target(
             name: "ExyteChat",
             dependencies: [
-                .product(name: "ExyteMediaPicker", package: "MediaPicker"),
                 .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
                 .product(name: "GiphyUISDK", package: "giphy-ios-sdk"),
                 .product(name: "Kingfisher", package: "Kingfisher")

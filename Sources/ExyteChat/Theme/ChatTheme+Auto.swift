@@ -105,18 +105,18 @@ internal struct ThemedChatView: ViewModifier {
         let backgroundColor = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
         return content
             .chatTheme(ChatTheme(accentColor: accentColor, background: background, improveContrast: improveContrast))
-            .mediaPickerTheme(
-                .init(
-                    main: .init(
-                        pickerText: .primary,
-                        pickerBackground: backgroundColor,
-                        fullscreenPhotoBackground: backgroundColor
-                    ),
-                    selection: .init(
-                        accent: accentColor
-                    )
-                )
-            )
+//            .mediaPickerTheme(
+//                .init(
+//                    main: .init(
+//                        pickerText: .primary,
+//                        pickerBackground: backgroundColor,
+//                        fullscreenPhotoBackground: backgroundColor
+//                    ),
+//                    selection: .init(
+//                        accent: accentColor
+//                    )
+//                )
+//            )
     }
 }
 

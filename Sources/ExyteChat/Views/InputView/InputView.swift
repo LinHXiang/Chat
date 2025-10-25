@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import ExyteMediaPicker
+//import ExyteMediaPicker
 import GiphyUISDK
 
 public enum InputViewStyle: Sendable {
@@ -64,7 +64,7 @@ public enum AvailableInputType: Sendable {
 }
 
 public struct InputViewAttachments {
-    var medias: [Media] = []
+//    var medias: [Media] = []
     var recording: Recording?
     var giphyMedia: GPHMedia?
     var replyMessage: ReplyMessage?
@@ -73,7 +73,7 @@ public struct InputViewAttachments {
 struct InputView: View {
     
     @Environment(\.chatTheme) private var theme
-    @Environment(\.mediaPickerTheme) private var pickerTheme
+//    @Environment(\.mediaPickerTheme) private var pickerTheme
 
     @EnvironmentObject private var keyboardState: KeyboardState
     
@@ -82,7 +82,7 @@ struct InputView: View {
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
     var messageStyler: (String) -> AttributedString
-    var recorderSettings: RecorderSettings = RecorderSettings()
+//    var recorderSettings: RecorderSettings = RecorderSettings()
     var localization: ChatLocalization
     
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -128,7 +128,7 @@ struct InputView: View {
         .background(backgroundColor)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
-            viewModel.setRecorderSettings(recorderSettings: recorderSettings)
+//            viewModel.setRecorderSettings(recorderSettings: recorderSettings)
         }
         .onDrag(towards: .bottom, ofAmount: 100...) {
             keyboardState.resignFirstResponder()
@@ -149,11 +149,11 @@ struct InputView: View {
                     giphyButton
                 }
             case .signature:
-                if viewModel.mediaPickerMode == .cameraSelection {
-                    addButton
-                } else {
+//                if viewModel.mediaPickerMode == .cameraSelection {
+//                    addButton
+//                } else {
                     Color.clear.frame(width: 12, height: 1)
-                }
+//                }
             }
         }
     }
@@ -212,7 +212,7 @@ struct InputView: View {
             } label: {
                 Image(systemName: "xmark")
                     .foregroundStyle(.white)
-                    .fontWeight(.bold)
+//                    .fontWeight(.bold)
                     .padding(5)
                     .background(Circle().foregroundStyle(.red))
             }
@@ -222,7 +222,7 @@ struct InputView: View {
             } label: {
                 Image(systemName: "checkmark")
                     .foregroundStyle(.white)
-                    .fontWeight(.bold)
+//                    .fontWeight(.bold)
                     .padding(5)
                     .background(Circle().foregroundStyle(.green))
             }
@@ -525,12 +525,12 @@ struct InputView: View {
     }
     
     var backgroundColor: Color {
-        switch style {
-        case .message:
+//        switch style {
+//        case .message:
             return theme.colors.mainBG
-        case .signature:
-            return pickerTheme.main.pickerBackground
-        }
+//        case .signature:
+//            return pickerTheme.main.pickerBackground
+//        }
     }
 
     func dragGesture() -> some Gesture {

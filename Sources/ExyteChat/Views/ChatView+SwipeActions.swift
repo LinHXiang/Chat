@@ -70,8 +70,13 @@ public struct SwipeAction<V: View>: SwipeActionable {
     
     @MainActor
     func render(type: ChatType) -> UIImage {
-        let renderer = ImageRenderer(content: self.content().rotationEffect(type == .conversation ? .degrees(180) : .degrees(0)))
-        renderer.scale = UIScreen.main.scale
-        return renderer.uiImage!
+        if #available(iOS 16.0, *) {
+            let renderer = ImageRenderer(content: self.content().rotationEffect(type == .conversation ? .degrees(180) : .degrees(0)))
+            renderer.scale = UIScreen.main.scale
+            return renderer.uiImage!
+        } else {
+            // Fallback on earlier versions
+            return UIImage()
+        }
     }
 }

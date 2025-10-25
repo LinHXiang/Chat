@@ -17,8 +17,9 @@ struct TextInputView: View {
     var localization: ChatLocalization
     
     var body: some View {
-        TextField("", text: $text, prompt: Text(style == .message ? localization.inputPlaceholder : localization.signatureText)
-            .foregroundColor(style == .message ? theme.colors.inputPlaceholderText : theme.colors.inputSignaturePlaceholderText), axis: .vertical)
+        if #available(iOS 16.0, *) {
+            TextField("", text: $text, prompt: Text(style == .message ? localization.inputPlaceholder : localization.signatureText)
+                .foregroundColor(style == .message ? theme.colors.inputPlaceholderText : theme.colors.inputSignaturePlaceholderText), axis: .vertical)
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
             .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
             .padding(.vertical, 10)
@@ -28,7 +29,10 @@ struct TextInputView: View {
                     globalFocusState.focus = .uuid(inputFieldId)
                 }
             )
-
+        } else {
+            // Fallback on earlier versions
+            EmptyView()
+        }
     }
     
     private func isMediaGiphyAvailable() -> Bool {
