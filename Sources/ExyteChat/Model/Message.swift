@@ -57,6 +57,8 @@ public struct Message: Identifiable, Hashable, Sendable {
     public var replyMessage: ReplyMessage?
 
     public var triggerRedraw: UUID?
+    public var customData: [String: AnyHashable]
+    public var uiType: String?
 
     public init(id: String,
                 user: User,
@@ -67,7 +69,9 @@ public struct Message: Identifiable, Hashable, Sendable {
                 giphyMediaId: String? = nil,
                 reactions: [Reaction] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
+                replyMessage: ReplyMessage? = nil,
+                customData: [String: AnyHashable] = [:],
+                uiType: String? = nil) {
 
         self.id = id
         self.user = user
@@ -79,6 +83,8 @@ public struct Message: Identifiable, Hashable, Sendable {
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
+        self.customData = customData
+        self.uiType = uiType
     }
 
     public static func makeMessage(
@@ -113,7 +119,9 @@ public struct Message: Identifiable, Hashable, Sendable {
                 attachments: [],//attachments,
                 giphyMediaId: giphyMediaId,
                 recording: draft.recording,
-                replyMessage: draft.replyMessage
+                replyMessage: draft.replyMessage,
+                customData: draft.customData,
+                uiType: draft.uiType
             )
         }
 }
@@ -135,7 +143,19 @@ extension Message: Equatable {
         lhs.attachments == rhs.attachments &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&
-        lhs.replyMessage == rhs.replyMessage
+        lhs.replyMessage == rhs.replyMessage &&
+        lhs.customData == rhs.customData &&
+        lhs.uiType == rhs.uiType
+    }
+}
+
+public struct CustomUIMarker: Codable, Hashable, Sendable {
+    public var uiType: String
+    public var customData: [String: String]
+    
+    public init(uiType: String, customData: [String: String] = [:]) {
+        self.uiType = uiType
+        self.customData = customData
     }
 }
 
