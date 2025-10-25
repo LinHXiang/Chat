@@ -653,7 +653,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            isScrolledToBottom = scrollView.contentOffset.y <= 0
+            isScrolledToBottom = scrollView.contentOffset.y <= spacingHeight
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
         }
     }
